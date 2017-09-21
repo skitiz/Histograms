@@ -1,32 +1,43 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <mpi.h>
-#include "histogram.h"
+//#include "histogram.h"
+#include <string.h>
+#include <limits.h>
+#include <sys/stat.h>
+#include <util.h>
+#include <assert.h>
 
-void get_input( 
-	int* bin_count;
-	int rank;
-	int comm_sz;
-	MPI_Comm comm);
+//Functions
 
-void setbins(	
-);
+long int get_intervals(const char *s);
 
-long int get_intervals(const char* s);
+int* getdatacount(const char* s);
+
+void getmaxmin(char* filename, unsigned long long int* size, int* min, int* max);
+
+void broadcastdata(unsigned int int bin_count, int min, int max, int comm_sz, int rank, MPI_Comm comm);
+
+long int* setbins(int min, int max, long int bin_count);
+
+int* findbins(int buffer[], long int bin_max[], long int bin_count, int min);
+
+int whichbin(int buffer, long int bin_max[], long int bin_count);
+
+void print_histogram(long int bin_max, int* bin_cts, long int bin_count, int* loc_bin_cts);
+
 
 int main(int argc, char** argv[])
 {
 	long int bin_count;
-	float* bin_max;
+	long int* bin_max;
 	unsigned long data_count;
 	unsigned long local_data_count;
 	int rank;
-	int* data;
-	float* data;
-	float* local_data
-	float min;
-	float max;
-	int* bin_cts;
+	int* buffer;
+	int* local_data;
+	float min, max;
+	int* bin_cts, loc_bin_cts;
 	int comm_sz;
 	const char* filename;
 	MPI_Comm comm;
@@ -37,28 +48,39 @@ int main(int argc, char** argv[])
 	MPI_Comm_size(comm, &comm_sz);
 	MPI_Comm_rank(comm, &rank);
 
+
 	filename = argv[1];
-	bin_count = getintervals(argv[2]);
-	data_count = getdatacount(argv[1]);
+	bin_count = get_intervals(argv[2]);
+	buffer = getdatacount(filename, &data_count);
 	local_data_count = data_count/comm_sz;
 	data_count = comm_sz * local_data_count;
-	getmaxmin(argv[1], &data_count, &min, &max);
-	broadcastdata(bin_count, min, max, data_count, comm_sz, rank, comm);
-	bin_max = malloc(bin_count*sizeof(float));
-	data = malloc(data_count*sizeof(int));
+	getmaxmin(buffer, data_count, &min, &max);
+	broadcastdata(bin_count, min, max, data_count, local_data,count, comm_sz, rank, comm);
+	
 
-
-	FILE* fp = fopen(filename, "r");
-	struct stat file_stat;
-	stat(filename, &file_stat);
-	unsigned long long int *size = file_stat.st_size;
-	int* buffer = malloc(*size * sizeof(int));
-	fread(buffer, sizeof(int), *size, fp);
+	bin_max = malloc(bin_count*sizeof(long int));
+	bin_cts = malloc(bin_count*sizeof(int));
+	loc_bin_cts = malloc(bin_count*sizeof(int));
+	local_data = malloc(local_data_count*sizeof(int));
 
 
 	MPI_Scatter(buffer,local_data_count,MPI_UNSIGNED_LONG,local_data,local_data_count,MPI_UNSIGNED_LONG, 0, comm)
-	bin_max = setbins(min, max, bin_count);
-	bin_cts = findbins(buffer, bin_max, bin_count);
+	
+	free(buffer);
+
+	bin_max = setbins(min, max, bin_count,loc_bin_cts);
+	bin_cts = findbins(local_data, bin_max, bin_count, loc_bin_cts);
+	MPI_Reduce(loc_bin_cts, bin_cts, bin_count, MPI_LONG_INT, MPI_SUM, 0, comm);
+	if(rank==0)
+	print_histogram(bin_max,bin_cts,bin_count,min);
+
+	free(local_data);
+	free(bin_max);
+	free(bin_cts);
+	free(loc_bin_cts);
+	free(filename);
+	MPI_Finalize();
+	return 0;
 }
 
 long int get_intervals(const char* s)
@@ -72,17 +94,11 @@ long int get_intervals(const char* s)
 	return num;
 }
 
-void getmaxmin(char* filename, unsigned long long int* size, int* min, int* max)
+void getmaxmin(int buffer[], unsigned int size, int* min, int* max)
 {
 	*max = INT_MAX;
 	*min = INT_MIN;
-	FILE* fp = fopen(filename,"r");
-	struct stat file_stat;
-	*size = file_stat.st_size;
-	*size = *size/sizeof(int);
-	int* buffer = malloc(*size *sizeof(int));
-	fread(buffer, sizeof(int), *size, f);
-	for(unsigned long long int i = 0; i<*size; ++i)
+	for(unsigned long long int i = 0; i< size; ++i)
 	{
 		if(buffer[i] < *min)
 		{
@@ -95,26 +111,28 @@ void getmaxmin(char* filename, unsigned long long int* size, int* min, int* max)
 	}
 }
 
-unsigned long data_count(char* s)
+int* getdatacount(const char* s, unsigned long* size)
 {
-	unsigned long* size;
+	FILE* fp = fopen(filename, "r");
 	struct stat file_stat;
 	stat(s, &file_stat);
 	*size = file_stat.st_size;
 	*size = *size/sizeof(int);
-	return size;
+	int* buffer = malloc(*size * sizeof(int));
+	fread(buffer, sizeof(int), *size, fp);
+	return buffer;
 }
 
-void broadcastdata(unsigned int int bin_count, int min, int max, int comm_sz, int rank, MPI_Comm comm)
+void broadcastdata(long int bin_count, int min, int max, unsigned long local_data_count, int comm_sz, int rank, MPI_Comm comm)
 {
 	MPI_Bcast(bin_count, 1, MPI_LONG_INT, 0, comm);
 	MPI_Bcast(min, 1, MPI_INT, 0, comm);
 	MPI_Bcast(max, 1, MPI_INT, 0, comm);
-	MPI(data_count, 1, MPI_UNSIGNED_LONG, comm);
-	//MPI(loc_data_count, 1, MPI_UNSIGNED_LONG, comm);
+	MPI(data_count, 1, MPI_UNSIGNED_LONG, 0, comm);
+	MPI(loc_data_count, 1, MPI_UNSIGNED_LONG, 0, comm);
 }
 
-float* setbins(int min, int max, long int bin_count)
+long int* setbins(int min, int max, long int bin_count, int loc_bin_cts[])
 {
 	long int range = max - min;
 	long int interval =  range/bin_count;
@@ -122,29 +140,57 @@ float* setbins(int min, int max, long int bin_count)
 	for(int i = 0; i<bin_count, i++)
 	{
 		endpoints[i] = interval * (long int)(i+1);
-		bin_cts[i] = 0;
+		loc_bin_cts[i] = 0;
 	}
 	return endpoints;
 }
 
-int* findbins(int buffer[], float bin_max[], long int bin_count, int min)
+int* findbins(int local_data[], long int bin_max[], long int bin_count, int min, int loc_bin_cts[])
 {
 	int* bin_cts; 
 	int bin;
 	for(long int i =0; i<data_count; i++)
 	{
-		bin = whichbin(buffer[i], bin_max, bin_count, min);
-		bin_cts[i]++;
+		bin = whichbin(local_data[i], bin_max, bin_count, min);
+		loc_bin_cts[i]++;
 	}
 	return bin_cts;
 }
 
-int whichbin(int buffer, float bin_max[], long int bin_count)
+int whichbin(int data, long int bin_max[], long int bin_count)
 {
 	long int i;
 	for(i = 0; i<bin_count; i++)
 	{
-		if(buffer <=bin_max[i]) break;
+		if(data <=bin_max[i]) break;
 	}
 	return i;
+}
+
+void print_histogram(long int bin_max[], int bin_cts[], long int bin_count, int min)
+{
+	int width=40;
+	int max = 0;
+	int row_width;
+	long int i;
+	int j;
+
+	for(i=0; i<bin_count; i++)
+	{
+		if(bin_cts[i] > max)
+		{
+			max = bin_cts[i];
+		}
+	}
+	for(i=0; i<bin_count; i++)
+	{
+		printf("%ld |", bin_max[i]);
+		row_width = (float) bin_cts[i] / (float) max * (float) width;
+		for(j=0; j<row_width; j++)
+		{
+			printf("#");
+		}
+		printf("   %d\n", bin_cts[i]);
+	}
+}
 }
