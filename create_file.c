@@ -9,7 +9,7 @@ size_t data_count (const char* error_message);
 
 void create_file (const char* file_name, size_t num);
 
-int main(int argc, char** argv[])
+int main(int argc, char** argv)
 {
 	if(argc < 3)
 	{
@@ -19,7 +19,7 @@ int main(int argc, char** argv[])
 	create_file(argv[1], num);
 }
 
-size_t data_count(const char* arg)
+size_t data_count (const char* arg)
 {
 	char* temp;
 	size_t num = strtol (arg, &temp, 10);
