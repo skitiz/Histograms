@@ -7,12 +7,15 @@
 
 long int get_intervals(char* s);
 int* max_min(char* filename, unsigned long long int* size, int* min, int* max);
+float* determine_intervals(int min, int max, long int intervals);
 
 int main(int argc, char* argv[]) 
 {
 	long int intervals;
 	int max, min;
 	unsigned long long int size;
+	int* buffer = NULL;
+	float* endpoints = NULL;
 
 	int thread_count = strtol(argv[1], NULL, 10);
 
@@ -24,10 +27,17 @@ int main(int argc, char* argv[])
 	printf("%ld", intervals);
 
 	//Determine max-min
-	int* buffer = max_min(s, &size, &max, &min);
+	buffer = max_min(s, &size, &max, &min);
+
+	//Determine intervals
+	endpoints = determine_intervals(min, max, intervals);
+	
+	for(long int i=0; i< intervals; i++)
+	{
+		printf("%6f , ", endpoints[i]);
+	}
 
 	printf("\nEnd of program.");
-
 	return 0;
 }
 
@@ -45,12 +55,13 @@ int* max_min(char* filename, unsigned long long int* size, int *max, int *min)
 	*min = INT_MAX;
 	struct stat file_stat;
 	unsigned long long int amount;
+	int* buffer = NULL;
 
 	fp = fopen(filename, "r");
 	stat(filename, &file_stat);
 	*size = file_stat.st_size;
 	*size /= sizeof(int);
-	int* buffer = malloc(*size *sizeof(int));
+	buffer = malloc(*size *sizeof(int));
 	amount = fread(buffer, sizeof(int), *size, fp);
 	for(unsigned long long int i = 0; i < *size; i++)
 	{
@@ -65,4 +76,18 @@ int* max_min(char* filename, unsigned long long int* size, int *max, int *min)
 
 	}
 	return buffer;
+}
+
+float* determine_intervals(int min, int max, long int intervals)
+{
+	float* endpoints = malloc(intervals * sizeof(float));
+	float length = (max-min) / (float) intervals;
+	float temp = min;
+	//#pragma omp parallel for
+	for(size_t i = 0; i < intervals; i++)
+	{
+		endpoints[i] = temp;
+		temp += length;
+	}
+	return endpoints;
 }
