@@ -14,7 +14,7 @@ Clone the repo and generate a data file for the program to read.
 
 `gcc -g -Wall -o create_file create_file.c -std=c99`    (I'm using for loops so I need c++ implementation.)
 
-./create_file 'name of data file' 'number of elements'
+`./create_file 'name of data file' 'number of elements'`
 
 
 To compile the exec files :
@@ -22,9 +22,9 @@ To compile the exec files :
 `gcc -g -Wall -o -mpi -fopenmp execfile mpi_file.c`   (Pick and choose the optional depending on the program you're running.)
 
 All the programs take similar command line arguments. 
-+ Serial version: ./nameofexec 'data file to read from' '# of intervals of histogram'
-+ MPI version: ./nameofexec '# of nodes of MPI' 'data_file_to_read_from' '# of intervals'
-+ OMP version: ./nameofexec '# of threads' 'data_file_to_read_from' '# of intervals'
++ Serial version: `./nameofexec 'data file to read from' '# of intervals of histogram'`
++ MPI version: `./nameofexec '# of nodes of MPI' 'data_file_to_read_from' '# of intervals'`
++ OMP version: `./nameofexec '# of threads' 'data_file_to_read_from' '# of intervals'`
 
 # Error checks
 I've added error checks in the programs to ensure that the minimum # of command line arguments are provided by the user.
