@@ -21,7 +21,7 @@ Clone the repo and generate a data file for the program to read.
 
 To compile the exec files :
 
-`gcc -g -Wall -o -mpi -fopenmp execfile mpi_file.c`   (Pick and choose the optional depending on the program you're running.)
+`gcc -g -Wall -o -mpi -fopenmp execfile mpi_file.c -std=c99`   (Pick and choose the optional depending on the program you're running.)
 
 All the programs take similar command line arguments. 
 + Serial version: `./nameofexec 'data file to read from' '# of intervals of histogram'`
