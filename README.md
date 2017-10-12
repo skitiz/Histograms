@@ -12,12 +12,14 @@ _Note : I haven't uploaded the serial version yet. And there are a few seg fault
 # How do I run these?
 Clone the repo and generate a data file for the program to read.
 
-gcc -g -Wall -o create_file create_file.c -std=c99    (I'm using for loops so I need c++ implementation.)
+`gcc -g -Wall -o create_file create_file.c -std=c99`    (I'm using for loops so I need c++ implementation.)
+
 ./create_file 'name of data file' 'number of elements'
 
 
 To compile the exec files :
-gcc -g -Wall -o _-mpi_ _-fopenmp_ execfile mpi_file.c   (Pick and choose the optional depending on the program you're running.)
+
+`gcc -g -Wall -o _-mpi_ _-fopenmp_ execfile mpi_file.c`   (Pick and choose the optional depending on the program you're running.)
 
 All the programs take similar command line arguments. 
 + Serial version: ./nameofexec 'data file to read from' '# of intervals of histogram'
@@ -26,6 +28,10 @@ All the programs take similar command line arguments.
 
 # Error checks
 I've added error checks in the programs to ensure that the minimum # of command line arguments are provided by the user.
+
 ~Also painstakingly made sure that there are no segfaults.~
 
 Please ensure you generate a data file __BEFORE__ you run the exec file.
+
+# Updates
+I've tried to add verbose comments about functions wherever I can, if you feel I'm lacking submit a pull request and I'll take a look.
