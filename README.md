@@ -1,3 +1,5 @@
+__Open to contributions. Submit a pull request and I'm happy to take a look.__
+
 Histograms
 ==========
 Calculating the run time of various ways of generating a histogram using different parallel and distributed computing algorithms. Using the serial version as a base for comparision.
