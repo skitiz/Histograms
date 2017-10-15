@@ -10,9 +10,9 @@
 long int get_intervals(char* s);
 int* max_min(char* filename, unsigned long long int* size, int* min, int* max);
 float* determine_intervals(int min, int max, long int intervals);
-unsigned long long int* occurences(int* buffer, unsigned long long int size, long int intervals, float* endpoints);
+unsigned long long int* count_occurences(int* buffer, unsigned long long int size, long int intervals, float* endpoints);
 size_t determine_index(int temp, float* endpoints, long int intervals);
-void display_histogram(long int intervals, unsigned long long int* occurences, float* endpoints)
+void display_histogram(long int intervals, unsigned long long int* occurences, float* endpoints);
 
 int main(int argc, char* argv[])
 {
@@ -78,7 +78,7 @@ void display_histogram (long int intervals, unsigned long long int* occurences, 
 	for (size_t i = 0; i < intervals ; ++i)
 	{
 		printf("%f - %f", endpoints[i], endpoints[i] + length);
-		printf("%lld\n", occurences[i] );
+		printf("        %lld\n", occurences[i] );
 	}
 }
 
