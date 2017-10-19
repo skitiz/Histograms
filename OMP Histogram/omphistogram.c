@@ -31,8 +31,8 @@ int main(int argc, char* argv[])
 		float* endpoints = NULL;
 		unsigned long long int* occurences = NULL;
 
-		if(argv[1] )
-		int thread_count = strtol(argv[1], NULL, 10);
+		if(argv[1])
+		{int thread_count = strtol(argv[1], NULL, 10);}
 
 		//File name
 		char* s = argv[2];
