@@ -240,8 +240,8 @@ void broadcastdata(char* s, char* filename, long int* intervals, int* min, int* 
 	if( my_rank == 0)
 	{
 		char* temp;
-		long int interval = 4;//strtol(s, &temp, 10);
-		*intervals = &interval;
+		long int interval = strtol(s, &temp, 10);
+		intervals = &interval;
 
 		FILE* fp;
 		*max = INT_MIN;
