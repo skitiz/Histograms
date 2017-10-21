@@ -294,15 +294,12 @@ void broadcastdata(char* s, char* filename, long int* intervals, int* min, int* 
 					*max = buffer[i];
 				}
 			}
+		free(buffer);
 	}
 	errorhandler(MPI_Bcast(intervals, 1, MPI_LONG_INT, 0, comm));
 	errorhandler(MPI_Bcast(min, 1, MPI_INT, 0, comm));
 	errorhandler(MPI_Bcast(max, 1, MPI_INT, 0, comm));
 	errorhandler(MPI_Bcast(size, 1, MPI_LONG_LONG_INT, 0, comm));
 	errorhandler(MPI_Bcast(local_size, 1, MPI_LONG_LONG_INT, 0, comm));
-	if(my_rank == 0)
-	{
-		free(buffer);
-	}
 }
 
