@@ -14,7 +14,7 @@ unsigned long long int* count_occurences(int* buffer, unsigned long long int siz
 size_t determine_index(int temp, float* endpoints, long int intervals);
 void display_histogram(long int intervals, unsigned long long int* occurences, float* endpoints);
 void errorhandler(error_code);
-void broadcastdata(char* s, char* filename, long int* intervals, int* max, int* min, unsigned long long int* local_size, unsigned long long int* size, int buffer[], int my_rank, MPI_Comm comm);
+void broadcastdata(char* s, char* filename, long int* intervals, int* max, int* min, unsigned long long int* local_size, unsigned long long int* size, int local_buffer[], int my_rank, MPI_Comm comm, int buffer[]);
 
 int main(int argc, char* argv[])
 {
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 		}
 
 
-		broadcastdata(argv[3], argv[2], &intervals, &max, &min, &local_size, &size, local_buffer, my_rank, comm, comm_sz);
+		broadcastdata(argv[3], argv[2], &intervals, &max, &min, &local_size, &size, local_buffer, my_rank, comm, comm_sz, buffer);
 		//Get the number of intervals
 		//if(my_rank == 0)
 		//{
@@ -235,7 +235,7 @@ void errorhandler(int error_code)
 	}
 }
 
-void broadcastdata(char* s, char* filename, long int* intervals, int* min, int* max, unsigned long long int* local_size, unsigned long long int* size, int local_buffer[], int my_rank, MPI_Comm comm, int comm_sz)
+void broadcastdata(char* s, char* filename, long int* intervals, int* min, int* max, unsigned long long int* local_size, unsigned long long int* size, int local_buffer[], int my_rank, MPI_Comm comm, int comm_sz, int buffer[])
 {
 	if( my_rank == 0)
 	{
@@ -248,7 +248,6 @@ void broadcastdata(char* s, char* filename, long int* intervals, int* min, int* 
 		*min = INT_MAX;
 		struct stat file_stat;
 		unsigned long long int amount;
-		int* buffer = NULL;
 
 		fp = fopen(filename, "r");
 		if(fp == NULL)
@@ -293,7 +292,7 @@ void broadcastdata(char* s, char* filename, long int* intervals, int* min, int* 
 					*max = buffer[i];
 				}
 			}
-		free(buffer);
+
 	}
 	errorhandler(MPI_Bcast(intervals, 1, MPI_LONG_INT, 0, comm));
 	errorhandler(MPI_Bcast(min, 1, MPI_INT, 0, comm));
