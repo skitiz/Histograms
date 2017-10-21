@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <time.h>
+#include <mpi.h>
 
 long int get_intervals(char* s);
 int* max_min(char* filename, unsigned long long int* size, int* min, int* max);
@@ -14,7 +15,7 @@ unsigned long long int* count_occurences(int* buffer, unsigned long long int siz
 size_t determine_index(int temp, float* endpoints, long int intervals);
 void display_histogram(long int intervals, unsigned long long int* occurences, float* endpoints);
 void errorhandler(error_code);
-void broadcastdata(char* s, char* filename, long int* intervals, int* max, int* min, unsigned long long int* local_size, unsigned long long int* size, int buffer[], int my_rank, MPI_Comm comm);
+void broadcastdata(char* s, char* filename, long int* intervals, int* max, int* min, unsigned long long int* local_size, unsigned long long int* size, int buffer[], int my_rank, MPI_Comm comm, int comm_sz);
 
 int main(int argc, char* argv[])
 {
