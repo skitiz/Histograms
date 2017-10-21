@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <time.h>
+#include <mpi.h>
 
 long int get_intervals(char* s);
 int* max_min(char* filename, unsigned long long int* size, int* min, int* max);
