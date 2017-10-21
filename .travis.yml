@@ -1,0 +1,5 @@
+language: c
+sudo: false # only for faster builds
+script:
+  - mpicc -g -Wall -fopenmp -o omp_hello omphistogram2.c
+  - mpiexec -n 4 omp_hello 4 data.txt 4
