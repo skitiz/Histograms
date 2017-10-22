@@ -7,9 +7,28 @@
 #include <time.h>
 #include <mpi.h>
 
-struct Data
+typedef struct
 {
-    long int intervals;
+    //      MPI INIT       //
+    int comm_sz;
+    int my_rank;
+
+    //      MPI Variables       //
+    int root;
+    string* file;
+    int maxMessage;
+    int *messageSize;
+    int minMessage;
+    int *local_buffer;
+    int *local_data;
+    int local_min;
+    int local_max;
+    int intervals;
+    int range;
+    bool keep_alive;
+    bool alive;
+
+/*    long int intervals;
     int min;
     int max;
     float* endpoints;
@@ -18,9 +37,31 @@ struct Data
     unsigned long long int size;
     unsigned long long int local_size;
     int* buffer;
-    int* local_buffer;
+    //int* local_buffer;
+*/
+
+    int unit;
+    string filePath;
+    int bufferSize;
+    int size;
+    int bucketSize;
+    int fileLength;
+    int min;
+    int max;
+    int *readBuffer;
+    int *data;
+    int seek;
+    int remainder;
 
 } node;
+
+int input(char* argv)
+{
+    char* temp;
+    int intervals = strtol(argv, &temp, 10);
+
+    return intervals;
+}
 
 void construct(struct Data node)
 {
@@ -173,6 +214,32 @@ void display_histogram(struct Data node)
 }
 int main(int argc, char* argv[])
 {
+    //      Start clock     //
+    clock_t begin = clock();
+
+    //      Initialize structure       //
+    node data;
+    data.messageSize = NULL;
+    data.local_buffer = NULL;
+    node.local_buffer = NULL;
+    node.readBuffer = NULL;
+    node.data = NULL;
+    node.file = NULL;
+
+    if(argc != 3)
+    {
+        cout<< "Error Error" >> endl;
+        count<< "Please provide the proper command line arguments." << endl;
+        exit(1);
+    }
+
+    node.filePath = argv[2]
+
+    node.intervals = input(argv[1]);
+    \\ Ensure that intervals are greater than 0.
+    assert(node.intervals > 0);
+
+    int numThreads = input(argv[3]);
     int my_rank;
     int comm_sz;
     MPI_Comm comm;
