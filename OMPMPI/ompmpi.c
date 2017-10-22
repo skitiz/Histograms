@@ -15,7 +15,7 @@ unsigned long long int* count_occurences(int* buffer, unsigned long long int siz
 size_t determine_index(int temp, float* endpoints, long int intervals);
 void display_histogram(long int intervals, unsigned long long int* occurences, float* endpoints);
 void errorhandler(error_code);
-void broadcastdata(char* s, char* filename, long int* intervals, int* max, int* min, unsigned long long int* local_size, unsigned long long int* size, int local_buffer[], int my_rank, MPI_Comm comm);
+void broadcastdata(char* s, char* filename, long int* intervals, int* max, int* min, unsigned long long int* local_size, unsigned long long int* size, int local_buffer[], int my_rank, MPI_Comm comm, int buffer[]);
 
 int main(int argc, char* argv[])
 {
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 		MPI_Status status;
 		MPI_Comm comm;
 
-		// Initializing MPI 
+		// Initializing MPI
 		errorhandler(MPI_Init(&argc, &argv));
 		comm = MPI_COMM_WORLD;
 		errorhandler(MPI_Comm_size(comm, &comm_sz));
@@ -301,4 +301,3 @@ void broadcastdata(char* s, char* filename, long int* intervals, int* min, int* 
 	errorhandler(MPI_Bcast(size, 1, MPI_LONG_LONG_INT, 0, comm));
 	errorhandler(MPI_Bcast(local_size, 1, MPI_LONG_LONG_INT, 0, comm));
 }
-
