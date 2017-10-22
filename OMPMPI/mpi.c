@@ -243,7 +243,7 @@ void Get_input(
      int* local_data_count_p, /* out */
      int my_rank,             /* in  */
      int comm_sz,             /* in  */
-     MPI_Comm comm            /* in  */
+     MPI_Comm comm,            /* in  */
      char* s,
      char* filename) {
 
