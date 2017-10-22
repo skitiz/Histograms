@@ -88,6 +88,11 @@ int main(int argc, char* argv[]) {
   int       my_rank;
   int       comm_sz;
   MPI_Comm  comm;
+  char*     s;
+  char*     filename;
+
+  s = argv[1];
+  filename = argv[2];
 
   // Initialize mpi
   e(MPI_Init(&argc, &argv));
@@ -97,7 +102,7 @@ int main(int argc, char* argv[]) {
 
   // get user inputs for bin_count, max_meas, min_meas, and data_count
   Get_input(&bin_count, &min_meas, &max_meas, &data_count,
-            &local_data_count, my_rank, comm_sz, comm, argv[1], argv[2]);
+            &local_data_count, my_rank, comm_sz, comm, s, filename);
 
   // allocate arrays
   bin_maxes = malloc(bin_count*sizeof(float));
