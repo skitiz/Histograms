@@ -86,7 +86,7 @@ void e(int error)
     }
 }
 
-void initialize(struct data* node, char* s, char* filename, int my_rank, MPI_Comm comm, int comm_sz);
+void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Comm comm, int comm_sz)
 {
     if(my_rank == 0)
     {
