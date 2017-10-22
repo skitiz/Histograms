@@ -191,11 +191,11 @@ int main(int argc, char* argv[])
         struct stat file_stat;
         unsigned long long int amount;
 
-        fp = fopen(argv[2], "r")
+        fp = fopen(argv[2], "r");
         node.buffer = malloc ( node.size * sizeof(int));
         if(node.buffer)
         {
-            amount = fread(node.buffer, sizeof(int), size, fp);
+            amount = fread(node.buffer, sizeof(int), node.size, fp);
             if(amount == 0)
             {
                 printf("\nCouldn't read the file.");
@@ -207,11 +207,11 @@ int main(int argc, char* argv[])
             printf("\nMalloc didn't succed.");
         }
 
-        e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, comm));
+        e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, 0, comm));
         free(fp);
         free(node.buffer);
     }
-    e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, comm));
+    e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, 0, comm));
 
     count_occurences(node);
     e(MPI_Reduce(local_occurences, occurences, intervals, MPI_LONG_INT, MPI_SUM, 0, comm));
