@@ -20,7 +20,7 @@ struct Data
     int* buffer;
     int* local_buffer;
 
-};
+} node;
 
 void construct(struct Data node)
 {
@@ -140,16 +140,16 @@ void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Com
 			}
 		}
     }
-    long int* intervals = &node->intervals;
-    int* min = &node->min;
-    int* max = &node->max;
-    unsigned long long int* size = &node->size;
-    unsigned long long int* local_size = &node->local_size;
-    e(MPI_Bcast(intervals, 1, MPI_LONG_INT, 0, comm));
-	e(MPI_Bcast(min, 1, MPI_INT, 0, comm));
-	e(MPI_Bcast(max, 1, MPI_INT, 0, comm));
-	e(MPI_Bcast(size, 1, MPI_LONG_LONG_INT, 0, comm));
-	e(MPI_Bcast(local_size, 1, MPI_LONG_LONG_INT, 0, comm));
+    long int* interval = &node->intervals;
+    int* mins = &node->min;
+    int* maxs = &node->max;
+    unsigned long long int* sizes = &node->size;
+    unsigned long long int* local_sizes = &node->local_size;
+    e(MPI_Bcast(interval, 1, MPI_LONG_INT, 0, comm));
+	e(MPI_Bcast(mins, 1, MPI_INT, 0, comm));
+	e(MPI_Bcast(maxs, 1, MPI_INT, 0, comm));
+	e(MPI_Bcast(sizes, 1, MPI_LONG_LONG_INT, 0, comm));
+	e(MPI_Bcast(local_sizes, 1, MPI_LONG_LONG_INT, 0, comm));
     if( my_rank == 0)
     {
         free(node->buffer);
@@ -180,7 +180,6 @@ int main(int argc, char* argv[])
     e(MPI_Comm_size(comm, &comm_sz));
     e(MPI_Comm_rank(comm, &my_rank));
 
-    struct Data node;
     initialize(&node, argv[1], argv[2], my_rank, comm, comm_sz);
     construct(node);
 
@@ -205,10 +204,6 @@ int main(int argc, char* argv[])
         {
             printf("\nMalloc didn't succed.");
         }
-
-        e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, 0, comm));
-        free(fp);
-        free(node.buffer);
     }
     e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, 0, comm));
 
