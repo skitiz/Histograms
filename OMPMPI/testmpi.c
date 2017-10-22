@@ -53,7 +53,7 @@ void endpoints(struct Data node)
 
 size_t determine_index(int temp, float* endpoints, long int intervals)
 {
-    assert(endpoints != NULL)
+    assert(endpoints != NULL);
     size_t index;
     for( index =0; index < intervals-1; index++)
     {
