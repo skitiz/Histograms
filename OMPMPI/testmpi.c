@@ -25,7 +25,7 @@ struct Data
 void construct(struct Data node)
 {
     node.endpoints = malloc( node.intervals * sizeof(float));
-    node.local_occurences = malloc( node.ntervals * sizeof(unsigned long long int));
+    node.local_occurences = malloc( node.intervals * sizeof(unsigned long long int));
     node.occurences = malloc( node.intervals * sizeof(unsigned long long int));
     node.buffer = malloc (node.size * sizeof(int));
     node.local_buffer = malloc (node.size * sizeof(int));
@@ -37,18 +37,29 @@ void destroy(struct Data node)
     free(node.local_occurences);
     free(node.occurences);
     free(node.buffer);
-    free(node.local_buffer)
+    free(node.local_buffer);
 }
 
 void endpoints(struct Data node)
 {
     float length = (node.max - node.min) / (float) node.intervals;
-    float temp = min;
+    float temp = node.min;
     for(size_t i = 0; i < node.intervals; i++)
     {
         node.endpoints[i] = temp;
         temp += length;
     }
+}
+
+size_t determine_index(int temp, float* endpoints, long int intervals)
+{
+    assert(endpoints != NULL)
+    size_t index;
+    for( index =0; index < intervals-1; index++)
+    {
+        if( temp <= endpoints[index]) break;
+    }
+    return index;
 }
 
 void count_occurences(struct Data node)
@@ -62,17 +73,6 @@ void count_occurences(struct Data node)
         size_t index = determine_index(node.local_buffer[i], node.endpoints, node.intervals);
         node.occurences[index]++;
     }
-}
-
-size_t determine_index(int temp, float* endpoints, long int intervals)
-{
-    assert(endpoints != NULL)
-    size_t index;
-    for( index =0; index < intervals-1; index++)
-    {
-        if( temp <= endpoints[index]) break;
-    }
-    return index;
 }
 
 void e(int error)
