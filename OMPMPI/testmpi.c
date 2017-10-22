@@ -188,7 +188,6 @@ int main(int argc, char* argv[])
     if( my_rank == 0)
     {
         FILE *fp;
-        struct stat file_stat;
         unsigned long long int amount;
 
         fp = fopen(argv[2], "r");
@@ -214,7 +213,7 @@ int main(int argc, char* argv[])
     e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, 0, comm));
 
     count_occurences(node);
-    e(MPI_Reduce(local_occurences, occurences, intervals, MPI_LONG_INT, MPI_SUM, 0, comm));
+    e(MPI_Reduce(node.local_occurences, node.occurences, node.intervals, MPI_LONG_INT, MPI_SUM, 0, comm));
     if(my_rank == 0)
     {
         display_histogram(node);
