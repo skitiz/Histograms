@@ -10,7 +10,7 @@
 struct Data
 {
     long int intervals;
-    int min,
+    int min;
     int max;
     float* endpoints;
     unsigned long long int* occurences;
