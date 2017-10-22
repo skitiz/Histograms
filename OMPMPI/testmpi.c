@@ -140,11 +140,11 @@ void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Com
 			}
 		}
     }
-    errorhandler(MPI_Bcast(node->intervals, 1, MPI_LONG_INT, 0, comm));
-	errorhandler(MPI_Bcast(node->min, 1, MPI_INT, 0, comm));
-	errorhandler(MPI_Bcast(node->max, 1, MPI_INT, 0, comm));
-	errorhandler(MPI_Bcast(node->size, 1, MPI_LONG_LONG_INT, 0, comm));
-	errorhandler(MPI_Bcast(node->local_size, 1, MPI_LONG_LONG_INT, 0, comm));
+    e(MPI_Bcast(*node->intervals, 1, MPI_LONG_INT, 0, comm));
+	e(MPI_Bcast(*node->min, 1, MPI_INT, 0, comm));
+	e(MPI_Bcast(*node->max, 1, MPI_INT, 0, comm));
+	e(MPI_Bcast(*node->size, 1, MPI_LONG_LONG_INT, 0, comm));
+	e(MPI_Bcast(*node->local_size, 1, MPI_LONG_LONG_INT, 0, comm));
     if( my_rank == 0)
     {
         free(node->buffer);
