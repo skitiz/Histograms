@@ -91,15 +91,15 @@ void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Com
     if(my_rank == 0)
     {
         char* temp;
-        *node.intervals = strtol(s, &temp, 10);
+        node.intervals = strtol(s, &temp, 10);
 
         FILE *fp;
-        *node.min = INT_MAX;
-        *node.max = INT_MIN;
+        node.min = INT_MAX;
+        node.max = INT_MIN;
         struct stat file_stat;
         unsigned long long int amount;
 
-        fp = fopen(filename, "r")
+        fp = fopen(filename, "r");
         if(fp == NULL)
         {
             printf("\nFile doesn't exist");
