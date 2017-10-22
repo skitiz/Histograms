@@ -33,7 +33,9 @@ void Get_input(   int* bin_count_p,
                   int* local_data_count_p,
                   int my_rank,
                   int comm_sz,
-                  MPI_Comm comm);
+                  MPI_Comm comm,
+                  char* s,
+                  char* filename);
 
 void Gen_data(    float local_data[],
                   int local_data_count,
@@ -249,7 +251,7 @@ void Get_input(
     char* temp;
     long int interval =  strtol(s, &temp, 10);
     bin_count_p = &interval;
-    
+
     printf("Minimum value (float): ");
     scanf("%f",min_meas_p);
     printf("Maximum value (float): ");
