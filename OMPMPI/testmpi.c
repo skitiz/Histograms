@@ -91,11 +91,11 @@ void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Com
     if(my_rank == 0)
     {
         char* temp;
-        node.intervals = strtol(s, &temp, 10);
+        node->intervals = strtol(s, &temp, 10);
 
         FILE *fp;
-        node.min = INT_MAX;
-        node.max = INT_MIN;
+        node->min = INT_MAX;
+        node->max = INT_MIN;
         struct stat file_stat;
         unsigned long long int amount;
 
@@ -111,13 +111,13 @@ void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Com
             printf("\n File invalid.");
             exit(0);
         }
-        *node.size = file_stat.st_size;
-        *size /= sizeof(int);
-        *local_size = *size / comm_sz;
-        *node.buffer = malloc ( *size *sizeof(int));
-        if(*node.buffer)
+        node->size = file_stat.st_size;
+        node->size /= sizeof(int);
+        node->local_size = node->size / comm_sz;
+        node->buffer = malloc ( node->size *sizeof(int));
+        if(node->buffer)
         {
-            amount = fread(*node.buffer, sizeof(int), *size, fp);
+            amount = fread(node->buffer, sizeof(int), node->size, fp);
             if(amount == 0)
             {
                 printf("\nCouldn't read the file.");
@@ -128,26 +128,26 @@ void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Com
         {
             printf("\nMalloc didn't succed.");
         }
-        for(unsigned long long int i = 0; i < *node.size; i++)
+        for(unsigned long long int i = 0; i < node->size; i++)
 		{
-			if((*node.buffer[i]) < *node.min)
+			if((node->buffer[i]) < node->min)
 			{
-				*node.min = *node.buffer[i];
+				node->min = node->buffer[i];
 			}
-			if((*node.buffer[i]) > *node.max)
+			if((node->buffer[i]) > node->max)
 			{
-				*node.max = *node.buffer[i];
+				node->max = node->buffer[i];
 			}
 		}
     }
-    errorhandler(MPI_Bcast(intervals, 1, MPI_LONG_INT, 0, comm));
-	errorhandler(MPI_Bcast(min, 1, MPI_INT, 0, comm));
-	errorhandler(MPI_Bcast(max, 1, MPI_INT, 0, comm));
-	errorhandler(MPI_Bcast(size, 1, MPI_LONG_LONG_INT, 0, comm));
-	errorhandler(MPI_Bcast(local_size, 1, MPI_LONG_LONG_INT, 0, comm));
+    errorhandler(MPI_Bcast(node->intervals, 1, MPI_LONG_INT, 0, comm));
+	errorhandler(MPI_Bcast(node->min, 1, MPI_INT, 0, comm));
+	errorhandler(MPI_Bcast(node->max, 1, MPI_INT, 0, comm));
+	errorhandler(MPI_Bcast(node->size, 1, MPI_LONG_LONG_INT, 0, comm));
+	errorhandler(MPI_Bcast(node->local_size, 1, MPI_LONG_LONG_INT, 0, comm));
     if( my_rank == 0)
     {
-        free(node.buffer);
+        free(node->buffer);
     }
 }
 
