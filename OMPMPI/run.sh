@@ -1,1 +1,1 @@
-mpicc -g -Wall -fopenmp -o omp_hello ompmpi.c -std=c99
+mpicc -g -Wall -fopenmp -o omp_hello testmpi.c -std=c99
