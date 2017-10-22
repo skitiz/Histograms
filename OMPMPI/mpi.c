@@ -93,9 +93,6 @@ int main(int argc, char* argv[]) {
   e(MPI_Comm_size(comm, &comm_sz));
   e(MPI_Comm_rank(comm, &my_rank));
 
-  char* temp;
-  long int intervals = strtol(argv[1], &temp, 10);
-
   // get user inputs for bin_count, max_meas, min_meas, and data_count
   Get_input(&bin_count, &min_meas, &max_meas, &data_count,
             &local_data_count, my_rank, comm_sz, comm);
