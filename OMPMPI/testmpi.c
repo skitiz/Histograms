@@ -143,7 +143,7 @@ void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Com
     long int* intervals = &node->intervals;
     int* min = &node->min;
     int* max = &node->max;
-    unsigned long long int* size = &node->size
+    unsigned long long int* size = &node->size;
     unsigned long long int* local_size = &node->local_size;
     e(MPI_Bcast(intervals, 1, MPI_LONG_INT, 0, comm));
 	e(MPI_Bcast(min, 1, MPI_INT, 0, comm));
