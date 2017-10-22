@@ -192,7 +192,7 @@ int main(int argc, char* argv[])
         unsigned long long int amount;
 
         fp = fopen(argv[2], "r")
-        node.buffer = malloc ( node.size *sizeof(int));
+        node.buffer = malloc ( node.size * sizeof(int));
         if(node.buffer)
         {
             amount = fread(node.buffer, sizeof(int), size, fp);
