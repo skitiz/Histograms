@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 
   // get user inputs for bin_count, max_meas, min_meas, and data_count
   Get_input(&bin_count, &min_meas, &max_meas, &data_count,
-            &local_data_count, my_rank, comm_sz, comm);
+            &local_data_count, my_rank, comm_sz, comm, argv[1], argv[2]);
 
   // allocate arrays
   bin_maxes = malloc(bin_count*sizeof(float));
@@ -241,11 +241,15 @@ void Get_input(
      int* local_data_count_p, /* out */
      int my_rank,             /* in  */
      int comm_sz,             /* in  */
-     MPI_Comm comm            /* in  */) {
+     MPI_Comm comm            /* in  */
+     char* s,
+     char* filename) {
 
   if(my_rank == 0) {
-    printf("Number of bins (int): ");
-    scanf("%d",bin_count_p);
+    char* temp;
+    long int interval =  strtol(s, &temp, 10);
+    bin_count_p = &interval;
+    
     printf("Minimum value (float): ");
     scanf("%f",min_meas_p);
     printf("Maximum value (float): ");
