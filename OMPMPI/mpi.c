@@ -26,7 +26,7 @@
 #include <time.h>
 #include <mpi.h>
 
-void Get_input(   int* bin_count_p,
+void Get_input(   long int* bin_count_p,
                   float* min_meas_p,
                   float* max_meas_p,
                   int* data_count_p,
@@ -75,7 +75,7 @@ void Print_histo( float bin_maxes[],
 void e(           int error);
 
 int main(int argc, char* argv[]) {
-  int       bin_count;
+  long int  bin_count;
   float     min_meas;
   float     max_meas;
   float*    bin_maxes;
@@ -236,7 +236,7 @@ void Gen_data(
 
 /*  Get user inputs for bin_count, max_meas, min_meas, and data_count */
 void Get_input(
-     int* bin_count_p,        /* out */
+     long int* bin_count_p,        /* out */
      float* min_meas_p,       /* out */
      float* max_meas_p,       /* out */
      int* data_count_p,       /* out */
@@ -270,7 +270,7 @@ void Get_input(
     *data_count_p = *local_data_count_p * comm_sz;
     printf("\n");
   }
-  e(MPI_Bcast(bin_count_p,1,MPI_INT,0,comm));
+  e(MPI_Bcast(bin_count_p,1,MPI_LONG_INT,0,comm));
   e(MPI_Bcast(min_meas_p,1,MPI_FLOAT,0,comm));
   e(MPI_Bcast(max_meas_p,1,MPI_FLOAT,0,comm));
   e(MPI_Bcast(data_count_p,1,MPI_INT,0,comm));
