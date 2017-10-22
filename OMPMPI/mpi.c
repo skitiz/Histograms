@@ -270,7 +270,7 @@ void Get_input(
     *data_count_p = *local_data_count_p * comm_sz;
     printf("\n");
   }
-  e(MPI_Bcast(bin_count_p,1,MPI_LONG_INT,0,comm));
+  e(MPI_Bcast(bin_count_p,1,MPI_LONG,0,comm));
   e(MPI_Bcast(min_meas_p,1,MPI_FLOAT,0,comm));
   e(MPI_Bcast(max_meas_p,1,MPI_FLOAT,0,comm));
   e(MPI_Bcast(data_count_p,1,MPI_INT,0,comm));
