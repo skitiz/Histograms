@@ -101,7 +101,10 @@ size_t determine_index(int temp, float* endpoints, long int intervals)
     size_t index;
     for( index = 0; index < intervals -1 ; index++)
     {
-        if(temp <= endpoints[index]) break;
+        if(temp <= endpoints[index])
+        {
+            break;
+        }
     }
     return index;
 }
