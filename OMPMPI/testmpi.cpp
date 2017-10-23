@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
     assert(data.intervals > 0);
 
     //Get threads for OMP
-    int numThreads = user_arguments(argv[2]);
+    int numThreads = user_arguments(argv[3]);
     assert(numThreads > 0);
 
     MPI_Init(NULL, NULL);
