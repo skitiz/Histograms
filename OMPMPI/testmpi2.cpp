@@ -1,21 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Marketplace
-Explore
- @skitiz
- Sign out
- Watch 0
-  Star 0  Fork 0 brown4224/parallel-system-assignment-04-mpi-omp
- Code  Issues 0  Pull requests 0  Projects 0  Wiki  Insights
-Branch: master Find file Copy pathparallel-system-assignment-04-mpi-omp/main.cpp
-fc25feb  19 hours ago
-@brown4224 brown4224 finalizing
-1 contributor
-RawBlameHistory
-585 lines (497 sloc)  18.7 KB
 /**
  * Sean McGlincy
  * Parallel Systems
