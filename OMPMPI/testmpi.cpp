@@ -21,7 +21,7 @@ typedef struct
 
     //      Root Variables      //
     int intervals;
-    string filename;
+    char* filename;
     int min;
     int max;
     unsigned long long int size;
@@ -64,11 +64,11 @@ void display_histogram (void *ptr)
     }
 }
 
-void determine_index(int temp, float* endpoints, long int intervals)
+size_t determine_index(int temp, float* endpoints, long int intervals)
 {
     assert(endpoints != NULL);
     size_t index;
-    for( index = 0; i< intervals -1 ; index++)
+    for( index = 0; index < intervals -1 ; index++)
     {
         if(temp <= endpoints[index]) break;
     }
@@ -81,7 +81,7 @@ void count_occurences(void *ptr)
     assert(data->buffer != NULL);
     assert(data->endpoints != NULL);
 
-    data->occurences = malloc (data->intervals, sizeof(unsigned long long int));
+    data->occurences = malloc (data->intervals, sizeof(int));
     if(data->occurences == NULL)
     {
         cout<<"\nMemory allocation failed....Exiting." ;
@@ -118,7 +118,7 @@ void read_file(void *ptr)
             }
             data->size = file_stat.st_size;
             data->size /= sizeof(int);
-            data->local_size = data->size/comm_sz;
+            data->local_size = data->size/ data->comm_sz;
             data->buffer = malloc( data->size * sizeof(int));
             if(data->buffer)
             {
@@ -224,6 +224,7 @@ int main(int argc, char* argv[])
     MPI_Scatter(data->buffer, data->local_size, MPI_INT, data->local_buffer, data->local_size, MPI_INT, 0, MPI_COMM_WORLD));
 
     determine_intervals(&data);
+
     count_occurences(&data);
     MPI_Reduce(data->local_occurences, data->occurences, data->intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD));
 
