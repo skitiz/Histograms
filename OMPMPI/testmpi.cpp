@@ -188,8 +188,7 @@ void determine_intervals(void *ptr)
     size_t i = 0;
     for(i =0; i < data->intervals; i++)
     {
-        data->endpoints[i] = length;
-        length += length;
+        data->endpoints[i] = data->interval * (i + 1);
         data->local_occurences[i] = 0;
     }
 }
