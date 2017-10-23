@@ -239,7 +239,7 @@ int main(int argc, char* argv[])
     count_occurences(&data);
     MPI_Reduce(data.local_occurences, data.occurences, data.intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    if(node.my_rank == 0)
+    if(data.my_rank == 0)
     {
         display_histogram(&data);
     }
