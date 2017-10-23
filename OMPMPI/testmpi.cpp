@@ -121,26 +121,29 @@ void read_file(void *ptr)
     {
         ifstream fp;
         struct stat file_stat;
-        vector <char> v;
         unsigned long long int amount;
 
         fp.open(data->filename, ios::binary);
         if(fp.is_open())
         {
-            int result = stat(data->filename, &file_stat);
-            if(result == -1)
+            //int result = stat(data->filename, &file_stat);
+        /*    if(result == -1)
             {
                 cout << "\nFile Invalid.";
                 MPI_Finalize();
                 exit(0);
             }
-            data->size = file_stat.st_size;
+        */
+            fp.seekg(0, fp.end);
+            data->size = fp.tellg();
+            fp.seekg = (is.tellg);
             data->size /= sizeof(int);
             data->local_size = data->size/ data->comm_sz;
+            char* buffer = new char [data->size];
             //data->buffer = malloc( data->size * sizeof(int));
             if(data->buffer)
             {
-                fp.read(&v[0], data->size);
+                fp.read(buffer, data->size);
                 amount = fp.gcount();
                 if(amount == 0)
                 {
