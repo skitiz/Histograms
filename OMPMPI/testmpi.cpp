@@ -136,7 +136,7 @@ void read_file(void *ptr)
         */
             fp.seekg(0, fp.end);
             data->size = fp.tellg();
-            fp.seekg = (is.tellg);
+            fp.seekg = (fp.tellg);
             data->size /= sizeof(int);
             data->local_size = data->size/ data->comm_sz;
             char* buffer = new char [data->size];
