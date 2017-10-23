@@ -113,7 +113,6 @@ void count_occurences(void *ptr, int numThreads)
     node *data = (node *) ptr;
     assert(data->buffer != NULL);
     assert(data->endpoints != NULL);
-    long int i;
 
     //data->occurences = malloc (data->intervals, sizeof(int));
     if(data->occurences == NULL)
@@ -122,9 +121,8 @@ void count_occurences(void *ptr, int numThreads)
         MPI_Finalize();
         exit(0);
     }
-    #pragma omp parallel for num_threads(numThreads) default(none) private(i) shared(data)
-    for(i = 0; i < data->local_size; i++)
-    //#pragma omp parallel for
+    #pragma omp parallel for
+    for(long int i = 0; i < data->local_size; i++)
     {
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
         data->local_occurences[index]++;
