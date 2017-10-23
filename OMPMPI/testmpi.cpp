@@ -112,7 +112,7 @@ void read_file(void *ptr)
     {
         ifstream fp;
         struct stat file_stat;
-        vector <int> v;
+        vector <char> v;
         unsigned long long int amount;
 
         fp.open(data->filename, ios::binary);
