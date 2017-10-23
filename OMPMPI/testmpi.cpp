@@ -113,7 +113,11 @@ void count_occurences(void *ptr, int numThreads)
     node *data = (node *) ptr;
     assert(data->buffer != NULL);
     assert(data->endpoints != NULL);
+<<<<<<< HEAD
     long int i;
+=======
+    int j;
+>>>>>>> parent of d95a441... Almost
 
     //data->occurences = malloc (data->intervals, sizeof(int));
     if(data->occurences == NULL)
@@ -122,8 +126,13 @@ void count_occurences(void *ptr, int numThreads)
         MPI_Finalize();
         exit(0);
     }
+<<<<<<< HEAD
     #pragma omp parallel for num_threads(numThreads) default(none) private(i) shared(data)
     for(i = 0; i < data->local_size; i++)
+=======
+    //#pragma omp parallel for
+    for(long int i = 0; i < data->local_size; i++)
+>>>>>>> parent of d95a441... Almost
     {
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
         data->local_occurences[index]++;
@@ -132,7 +141,7 @@ void count_occurences(void *ptr, int numThreads)
 
 
 //          Reading the file.       //
-void read_file(void *ptr, int numThreads)
+void read_file(void *ptr)
 {
     node *data = (node *) ptr;
     if(data->my_rank == 0)
@@ -167,12 +176,8 @@ void read_file(void *ptr, int numThreads)
 		else
 		{
 			printf("\nValue of malloc didn't succed.");
-            cout << "\n Exiting..";
-            MPI_Finalize();
-            exit(0);
 		}
 
-        #pragma omp for schedule (static, *data->local_size / numThreads)
         for(unsigned long long int i = 0; i < data->size; i++)
         {
             if(data->buffer[i] < data->min)
@@ -255,7 +260,7 @@ int main(int argc, char* argv[])
     data.local_occurences = (int *) malloc( data.intervals * sizeof(int));
     data.occurences = (int *) malloc (data.intervals * sizeof(int));
 
-    read_file(&data, numThreads);
+    read_file(&data);
 
     build_mpi_data_type(&data.intervals, &data.min, &data.max, &data.size, &data.local_size);
     MPI_Scatter(data.buffer, data.local_size, MPI_INT, data.local_buffer, data.local_size, MPI_INT, 0, MPI_COMM_WORLD);
