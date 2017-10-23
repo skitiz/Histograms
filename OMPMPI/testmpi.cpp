@@ -232,12 +232,12 @@ int main(int argc, char* argv[])
     omp_set_dynamic(0);
     read_file(&data);
 
-    MPI_Scatter(data->buffer, data->local_size, MPI_INT, data->local_buffer, data->local_size, MPI_INT, 0, MPI_COMM_WORLD));
+    MPI_Scatter(data.buffer, data.local_size, MPI_INT, data.local_buffer, data.local_size, MPI_INT, 0, MPI_COMM_WORLD));
 
     determine_intervals(&data);
 
     count_occurences(&data);
-    MPI_Reduce(data->local_occurences, data->occurences, data->intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD));
+    MPI_Reduce(data.local_occurences, data.occurences, data.intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD));
 
     if(node.my_rank == 0)
     {
