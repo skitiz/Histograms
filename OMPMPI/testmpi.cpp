@@ -34,6 +34,14 @@ typedef struct
 
 } node;
 
+int user_arguments(char *argv) {
+    char *endptr;
+    int intervalSize = strtol(argv, &endptr, 10);
+    if (!*argv || *endptr)
+        cerr << "Invalid number " << argv << '\n';
+    return intervalSize;
+}
+
 void display_histogram (void *ptr)
 {
     node *data = (node *) ptr;
@@ -174,7 +182,7 @@ void determine_intervals(void *ptr)
 {
     node *data = (node *) ptr;
     float length = (data->max-data->min) / (float) data->intervals;
-    float temp = data->min;
+    //float temp = data->min;
 
     size_t i = 0;
     for(i =0; i < data->intervals; i++)
@@ -214,7 +222,7 @@ int main(int argc, char* argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &data.my_rank);
 
 
-    data.local_buffer = malloc(local_size * sizeof(int));
+    data.local_buffer = malloc(data.local_size * sizeof(int));
     data.endpoints = malloc( data.intervals * sizeof(float));
     data.buffer = malloc(data.size = * sizeof(int));
     data.local_buffer = malloc(local_size * sizeof(int));
