@@ -9,10 +9,7 @@
         To run : mpiexec -n <n> ./mpi <intervals> <filename> <threads>
 
 
-        Build status : Not working.
-
-        1. It is currently not able to sort the data into a histogram.
-        2. It runs into segfaults for large data.txt files. Limited to less than 10000 elements in the file.
+        Build status : Working
 
 */
 
@@ -128,10 +125,6 @@ void count_occurences(void *ptr, int numThreads)
     //#pragma omp parallel for
     for(long int i = 0; i < data->local_size; i++)
     {
-        if((i>5) && (i<10))
-        {
-            cout<<" " <<local_buffer[i];
-        }
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
         data->local_occurences[index]++;
     }
@@ -203,7 +196,6 @@ void read_file(void *ptr)
     MPI_Bcast(data->size, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data->local_size, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
 */
-}
 
 
 //             Determine intervals from # of intervals and max, min         //
@@ -228,8 +220,8 @@ int main(int argc, char* argv[])
     clock_t begin = clock();
 
     node data;
-    data.size = 10000;
-    data.local_size = 10000;
+    data.size = 1000000;
+    data.local_size = 1000000;
     data.buffer = NULL;
     data.local_buffer = NULL;
     data.endpoints = NULL;
