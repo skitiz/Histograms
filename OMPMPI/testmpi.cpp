@@ -222,12 +222,12 @@ int main(int argc, char* argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &data.my_rank);
 
 
-    data.local_buffer = malloc(data.local_size * sizeof(int));
-    data.endpoints = malloc( data.intervals * sizeof(float));
-    data.buffer = malloc(data.size = * sizeof(int));
-    data.local_buffer = malloc(local_size * sizeof(int));
-    data.local_occurences = malloc( data.intervals * sizeof(int));
-    data.occurences = malloc (data.intervals * sizeof(int));
+    data.local_buffer = (int *) malloc(sizeof(int) * data.local_size);
+    data.endpoints = (float *) malloc( data.intervals * sizeof(float));
+    data.buffer = (int *) malloc(data.size = * sizeof(int));
+    data.local_buffer = (int *) malloc(local_size * sizeof(int));
+    data.local_occurences = (int *) malloc( data.intervals * sizeof(int));
+    data.occurences = (int *) malloc (data.intervals * sizeof(int));
 
     omp_set_dynamic(0);
     read_file(&data);
