@@ -1,3 +1,21 @@
+/*
+        Kshitij Bantupalli
+        Parallel and Distributed Systems
+        Assignment 4
+
+        The program is written in C++.
+
+        To compile : mpiCC -g -filename -fopenmp -o mpi testmpi.cpp
+        To run : mpiexec -n <n> ./mpi <intervals> <filename> <threads>
+
+
+        Build status : Not working.
+
+        1. It is currently not able to sort the data into a histogram.
+        2. It runs into segfaults for large data.txt files. Limited to less than 10000 elements in the file.
+
+*/
+
 #include <sstream>
 #include <cstdlib>
 #include <iostream>
@@ -13,6 +31,8 @@
 
 using namespace std;
 
+
+//          Define the struct for MPI       //
 typedef struct
 {
     //      MPI Variables       //
@@ -34,6 +54,7 @@ typedef struct
 
 } node;
 
+//          Broadcasting data to all nodes of MPI       //
 void build_mpi_data_type(int* data_1, int* data_2, int* data_3, long int* data_4, long int* data_5)
 {
     MPI_Bcast(data_1, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -43,6 +64,8 @@ void build_mpi_data_type(int* data_1, int* data_2, int* data_3, long int* data_4
     MPI_Bcast(data_5, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
 }
 
+
+//          Converting user arguments for char* to usable values    //
 int user_arguments(char *argv) {
     char *endptr;
     int intervalSize = strtol(argv, &endptr, 10);
@@ -51,6 +74,8 @@ int user_arguments(char *argv) {
     return intervalSize;
 }
 
+
+//          Root node will display histogram        //
 void display_histogram (void *ptr)
 {
     node *data = (node *) ptr;
@@ -68,6 +93,8 @@ void display_histogram (void *ptr)
     }
 }
 
+
+//              Determine the index of the elements             //
 size_t determine_index(int temp, float* endpoints, long int intervals)
 {
     assert(endpoints != NULL);
@@ -79,6 +106,8 @@ size_t determine_index(int temp, float* endpoints, long int intervals)
     return index;
 }
 
+
+//     Counting occurances for histogram. Currently sorts everything into one interval.     //
 void count_occurences(void *ptr, int numThreads)
 {
     node *data = (node *) ptr;
@@ -102,6 +131,7 @@ void count_occurences(void *ptr, int numThreads)
 }
 
 
+//          Reading the file.       //
 void read_file(void *ptr)
 {
     node *data = (node *) ptr;
@@ -180,6 +210,8 @@ void read_file(void *ptr)
 */
 }
 
+
+//             Determine intervals from # of intervals and max, min         //
 void determine_intervals(void *ptr)
 {
     node *data = (node *) ptr;
@@ -193,6 +225,8 @@ void determine_intervals(void *ptr)
         data->local_occurences[i] = 0;
     }
 }
+
+
 
 int main(int argc, char* argv[])
 {
@@ -230,7 +264,6 @@ int main(int argc, char* argv[])
     data.local_occurences = (int *) malloc( data.intervals * sizeof(int));
     data.occurences = (int *) malloc (data.intervals * sizeof(int));
 
-    omp_set_dynamic(0);
     read_file(&data);
 
     build_mpi_data_type(&data.intervals, &data.min, &data.max, &data.size, &data.local_size);
