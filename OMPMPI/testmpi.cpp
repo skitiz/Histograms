@@ -81,7 +81,7 @@ void count_occurences(void *ptr)
     assert(data->buffer != NULL);
     assert(data->endpoints != NULL);
 
-    data->occurences = malloc (data->intervals, sizeof(int));
+    //data->occurences = malloc (data->intervals, sizeof(int));
     if(data->occurences == NULL)
     {
         cout<<"\nMemory allocation failed....Exiting." ;
@@ -119,7 +119,7 @@ void read_file(void *ptr)
             data->size = file_stat.st_size;
             data->size /= sizeof(int);
             data->local_size = data->size/ data->comm_sz;
-            data->buffer = malloc( data->size * sizeof(int));
+            //data->buffer = malloc( data->size * sizeof(int));
             if(data->buffer)
             {
                 amount = fread(data->buffer, sizeof(int), data->size, fp);
@@ -210,6 +210,7 @@ int main(int argc, char* argv[])
     MPI_Init(NULL, NULL);
     MPI_Comm_size(MPI_COMM_WORLD, &data.comm_sz);
     MPI_Comm_rank(MPI_COMM_WORLD, &data.my_rank);
+
 
     data.local_buffer = malloc(local_size * sizeof(int));
     data.endpoints = malloc( data.intervals * sizeof(float));
