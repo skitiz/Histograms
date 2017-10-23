@@ -79,11 +79,12 @@ size_t determine_index(int temp, float* endpoints, long int intervals)
     return index;
 }
 
-void count_occurences(void *ptr)
+void count_occurences(void *ptr, int numThreads)
 {
     node *data = (node *) ptr;
     assert(data->buffer != NULL);
     assert(data->endpoints != NULL);
+    int j;
 
     //data->occurences = malloc (data->intervals, sizeof(int));
     if(data->occurences == NULL)
@@ -92,7 +93,7 @@ void count_occurences(void *ptr)
         MPI_Finalize();
         exit(0);
     }
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for(unsigned long long int i = 0; i < data->local_size; i++)
     {
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
@@ -107,7 +108,7 @@ void read_file(void *ptr)
     if(data->my_rank == 0)
     {
         ifstream fp;
-        struct stat file_stat;
+        //struct stat file_stat;
         unsigned long long int amount;
 
         fp.open(data->filename, ios::binary);
@@ -182,7 +183,7 @@ void read_file(void *ptr)
 void determine_intervals(void *ptr)
 {
     node *data = (node *) ptr;
-    float length = (data->max-data->min) / (float) data->intervals;
+    //float length = (data->max-data->min) / (float) data->intervals;
     //float temp = data->min;
 
     size_t i = 0;
@@ -237,7 +238,7 @@ int main(int argc, char* argv[])
 
     determine_intervals(&data);
 
-    count_occurences(&data);
+    count_occurences(&data, numThreads);
     MPI_Reduce(data.local_occurences, data.occurences, data.intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if(data.my_rank == 0)
@@ -255,6 +256,8 @@ int main(int argc, char* argv[])
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     cout<< "\nTime spent = " << time_spent;
+
+    cout<<"\n";
 
     return 0;
 }
