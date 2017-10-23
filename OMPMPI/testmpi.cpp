@@ -93,8 +93,8 @@ void count_occurences(void *ptr, int numThreads)
         MPI_Finalize();
         exit(0);
     }
-    #pragma omp parallel for
-    for(unsigned long long int i = 0; i < data->local_size; i++)
+    //#pragma omp parallel for
+    for(long int i = 0; i < data->local_size; i++)
     {
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
         data->local_occurences[index]++;
