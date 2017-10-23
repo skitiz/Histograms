@@ -57,8 +57,9 @@ void display_histogram (void *ptr)
     assert(data->occurences != NULL);
     assert(data->endpoints != NULL);
 
+    int i;
 
-    float length = endpoints[1] - endpoints[0];
+    float length = data->endpoints[1] - data->endpoints[0];
 
     for(i = 0; i < data->intervals; i++ )
     {
