@@ -1,290 +1,249 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <omp.h>
-#include <sys/stat.h>
-#include <limits.h>
+#include <sstream>
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <vector>
 #include <assert.h>
-#include <time.h>
 #include <mpi.h>
+
+ifdef _OPENMP
+
+include <omp.h>
+include <sys/stat.h>
+
+endif
+
+using namespace std;
 
 typedef struct
 {
-    //      MPI INIT       //
-    int comm_sz;
-    int my_rank;
-
     //      MPI Variables       //
-    int root;
-    string* file;
-    int maxMessage;
-    int *messageSize;
-    int minMessage;
-    int *local_buffer;
-    int *local_data;
-    int local_min;
-    int local_max;
-    int intervals;
-    int range;
-    bool keep_alive;
-    bool alive;
+    int my_rank;
+    int comm_sz;
 
-/*    long int intervals;
+    //      Root Variables      //
+    int intervals;
+    string filename;
     int min;
     int max;
-    float* endpoints;
-    unsigned long long int* occurences;
-    unsigned long long int* local_occurences;
     unsigned long long int size;
     unsigned long long int local_size;
     int* buffer;
-    //int* local_buffer;
-*/
-
-    int unit;
-    string filePath;
-    int bufferSize;
-    int size;
-    int bucketSize;
-    int fileLength;
-    int min;
-    int max;
-    int *readBuffer;
-    int *data;
-    int seek;
-    int remainder;
+    int* local_buffer;
+    float* endpoints;
+    int* occurences;
+    int* local_occurences;
 
 } node;
 
-int input(char* argv)
+void display_histogram (void *ptr)
 {
-    char* temp;
-    int intervals = strtol(argv, &temp, 10);
+    node *data = (node *) ptr;
+    assert(data->occurences != NULL);
+    assert(data->endpoints != NULL);
 
-    return intervals;
-}
+    int width = 40;
+    int max = 0;
+    int row_width;
+    int i;
+    int j;
 
-void construct(struct Data node)
-{
-    node.endpoints = malloc( node.intervals * sizeof(float));
-    node.local_occurences = malloc( node.intervals * sizeof(unsigned long long int));
-    node.occurences = malloc( node.intervals * sizeof(unsigned long long int));
-    node.buffer = malloc (node.size * sizeof(int));
-    node.local_buffer = malloc (node.size * sizeof(int));
-}
-
-void destroy(struct Data node)
-{
-    free(node.endpoints);
-    free(node.local_occurences);
-    free(node.occurences);
-    free(node.buffer);
-    free(node.local_buffer);
-}
-
-void endpoints(struct Data node)
-{
-    float length = (node.max - node.min) / (float) node.intervals;
-    float temp = node.min;
-    for(size_t i = 0; i < node.intervals; i++)
+    for(i = 0; i < data->intervals; i++)
     {
-        node.endpoints[i] = temp;
-        temp += length;
+        if(data->occurences[i] > max)
+            max = data->occurences[i];
+    }
+
+    for(i = 0; i < data->intervals; i++ )
+    {
+        cout<<" |" << data->endpoints[i];
+        row_width = (float) data->occurences / (float) max * (float) width;
+        for(j=0; j< row_width; j++)
+        {
+            cout<< "#";
+        }
+        cout << "   \n" << data->occurences[i];
     }
 }
 
-size_t determine_index(int temp, float* endpoints, long int intervals)
+void count_occurences(void *ptr)
 {
-    assert(endpoints != NULL);
-    size_t index;
-    for( index =0; index < intervals-1; index++)
+    node *data = (node *) ptr;
+    assert(data->buffer != NULL);
+    assert(data->endpoints != NULL);
+
+    data->occurences = calloc (data->intervals, sizeof(unsigned long long int));
+    if(data->occurences == NULL)
     {
-        if( temp <= endpoints[index])
-        {
-            break;
-        }
+        cout>> "\nMemory allocation failed....Exiting." ;
+        MPI_Finalize();
+        exit(0);
+    }
+    #pragma omp parallel for
+    for(unsigned long long int i = 0; i < data->local_size; i++)
+    {
+        size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
+        local_occurences[index]++
+    }
+}
+
+void determine_index(int temp, float* endpoints, long int intervals)
+{
+    assert(endpoints != NULL)
+    size_t index;
+    for( index = 0; i< intervals -1 ; index++)
+    {
+        if(temp <= endpoints[index]) break;
     }
     return index;
 }
 
-void count_occurences(struct Data node)
+
+void read_file(void *ptr)
 {
-    assert (node.buffer != NULL);
-    assert (node.endpoints != NULL);
-
-    #pragma omp parallel for
-    for(int i=0; i< node.local_size; i++)
+    node *data = (node *) ptr;
+    if(data->my_rank == 0)
     {
-        size_t index = determine_index(node.local_buffer[i], node.endpoints, node.intervals);
-        node.occurences[index]++;
-    }
-}
-
-void e(int error)
-{
-    if(error != MPI_SUCCESS)
-    {
-        fprintf(stderr, "Error starting MPI program! \n");
-        MPI_Abort(MPI_COMM_WORLD, error);
-        MPI_Finalize();
-        exit(1);
-    }
-}
-
-void initialize(struct Data* node, char* s, char* filename, int my_rank, MPI_Comm comm, int comm_sz)
-{
-    if(my_rank == 0)
-    {
-        char* temp;
-        node->intervals = strtol(s, &temp, 10);
-
-        FILE *fp;
-        node->min = INT_MAX;
-        node->max = INT_MIN;
+        ifstream fp;
         struct stat file_stat;
         unsigned long long int amount;
 
-        fp = fopen(filename, "r");
-        if(fp == NULL)
+        fp.open(data->filename, ios::binary);
+        if(fp.is_open())
         {
-            printf("\nFile doesn't exist");
-            exit(0);
-        }
-        int result = stat(filename, &file_stat);
-        if(result == -1)
-        {
-            printf("\n File invalid.");
-            exit(0);
-        }
-        node->size = file_stat.st_size;
-        node->size /= sizeof(int);
-        node->local_size = node->size / comm_sz;
-        node->buffer = malloc ( node->size *sizeof(int));
-        if(node->buffer)
-        {
-            amount = fread(node->buffer, sizeof(int), node->size, fp);
-            if(amount == 0)
+            int result = stat(data->filename, &file_stat);
+            if(result == -1)
             {
-                printf("\nCouldn't read the file.");
+                cout << "\nFile Invalid.";
+                MPI_Finalize();
                 exit(0);
+            }
+            data->size = file_stat.st_size;
+            data->size /= sizeof(int);
+            data->local_size = data->size/comm_sz;
+            data->buffer = malloc( data->size * sizeof(int));
+            if(data->buffer)
+            {
+                amount = fread(data->buffer, sizeof(int), data->size, fp);
+                if(amount == 0)
+                {
+                    cout << "\nCouldn't read the file.";
+                    MPI_Finalize();
+                    exit(0);
+                }
+            }
+            else
+            {
+                cout << "\nValue of malloc didn't succed.";
+                MPI_Finalize();
+                exit(0);
+            }
+
+            for(unsigned long long int i = 0; i < data->size; i++)
+            {
+                if(data->buffer[i] < data->min)
+                {
+                    data->min = data->buffer[i];
+                }
+                if(data->buffer[i] > data->max)
+                {
+                    data->max = data->buffer[i];
+                }
+            }
+            fp->fileLength = fp.tellg();
+            fp->iterations = (int) ceil((double) data->fileLength / data->bufferSize);
+
+            if (data->fileLength < data->bufferSize)
+            {
+                data->minMessage = (data->fileLength / data->unit) / data->comm_sz;
             }
         }
         else
         {
-            printf("\nMalloc didn't succed.");
+            cout << "\nCannot open file.";
         }
-        for(unsigned long long int i = 0; i < node->size; i++)
-		{
-			if((node->buffer[i]) < node->min)
-			{
-				node->min = node->buffer[i];
-			}
-			if((node->buffer[i]) > node->max)
-			{
-				node->max = node->buffer[i];
-			}
-		}
     }
-    long int* interval = &node->intervals;
-    int* mins = &node->min;
-    int* maxs = &node->max;
-    unsigned long long int* sizes = &node->size;
-    unsigned long long int* local_sizes = &node->local_size;
-    e(MPI_Bcast(interval, 1, MPI_LONG_INT, 0, comm));
-	e(MPI_Bcast(mins, 1, MPI_INT, 0, comm));
-	e(MPI_Bcast(maxs, 1, MPI_INT, 0, comm));
-	e(MPI_Bcast(sizes, 1, MPI_LONG_LONG_INT, 0, comm));
-	e(MPI_Bcast(local_sizes, 1, MPI_LONG_LONG_INT, 0, comm));
-    if( my_rank == 0)
-    {
-        free(node->buffer);
-    }
+    MPI_Bcast(data->intervals, 1, MPI_LONG_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data->min, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data->max, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data->size, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data->local_size, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
 }
 
-void display_histogram(struct Data node)
+void determine_intervals(void *ptr)
 {
-    assert (node.occurences != NULL);
-    assert (node.endpoints != NULL);
+    node *data = (node *) ptr;
+    float length = (data->max-data->min) / (float) data->intervals;
+    float temp = data->min;
 
-    float length = node.endpoints[1] - node.endpoints[0];
-    for(size_t i = 0; i < node.intervals ; ++i)
+    size_t i = 0;
+    for(i =0; i < data->intervals; i++)
     {
-        printf("%f - %f", node.endpoints[i], node.endpoints[i] + length );
-        printf("            %lld\n", node.occurences[i] );
+        data->endpoints[i] = length;
+        length += length;
+        data->local_occurences[i] = 0;
     }
 }
+
 int main(int argc, char* argv[])
 {
-    //      Start clock     //
     clock_t begin = clock();
 
-    //      Initialize structure       //
     node data;
-    data.messageSize = NULL;
+    data.size = 10000;
+    data.local_size = 10000;
+    data.buffer = NULL;
     data.local_buffer = NULL;
-    node.local_buffer = NULL;
-    node.readBuffer = NULL;
-    node.data = NULL;
-    node.file = NULL;
+    data.endpoints = NULL;
+    data.occurences = NULL;
+    data.local_occurences = NULL;
 
-    if(argc != 3)
+    //File for reading
+    data.filename = argv[2];
+
+    //Get intervals for Histogram
+    data.intervals = user_arguments(argv[1]);
+    assert(data.intervals > 0);
+
+    //Get threads for OMP
+    int numThreads = user_arguments(argv[2]);
+    assert(numThreads > 0);
+
+    MPI_Init(NULL, NULL);
+    MPI_Comm_size(MPI_COMM_WORLD, &data.comm_sz);
+    MPI_Comm_rank(MPI_COMM_WORLD, &data.my_rank);
+
+    data.local_buffer = malloc(local_size * sizeof(int));
+    data.endpoints = malloc( data.intervals * sizeof(float));
+    data.buffer = malloc(data.size = * sizeof(int));
+    data.local_buffer = malloc(local_size * sizeof(int));
+    data.local_occurences = malloc( data.intervals * sizeof(int));
+    data.occurences = malloc (data.intervals * sizeof(int));
+
+    omp_set_dynamic(0);
+    read_file(&data);
+
+    MPI_Scatter(data->buffer, data->local_size, MPI_INT, data->local_buffer, data->local_size, MPI_INT, 0, MPI_COMM_WORLD));
+
+    determine_intervals(&data);
+    count_occurences(&data);
+    MPI_Reduce(data->local_occurences, data->occurences, data->intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD));
+
+    if(node.my_rank == 0)
     {
-        cout<< "Error Error" >> endl;
-        count<< "Please provide the proper command line arguments." << endl;
-        exit(1);
+        display_histogram(&data);
     }
 
-    node.filePath = argv[2]
+    free(data->buffer);
+    free(data->local_buffer);
+    free(data->endpoints);
+    free(data->occurences);
 
-    node.intervals = input(argv[1]);
-    \\ Ensure that intervals are greater than 0.
-    assert(node.intervals > 0);
-
-    int numThreads = input(argv[3]);
-    int my_rank;
-    int comm_sz;
-    MPI_Comm comm;
-
-    //Initialize mpi
-    e(MPI_Init(&argc, &argv));
-    comm = MPI_COMM_WORLD;
-    e(MPI_Comm_size(comm, &comm_sz));
-    e(MPI_Comm_rank(comm, &my_rank));
-
-    initialize(&node, argv[1], argv[2], my_rank, comm, comm_sz);
-    construct(node);
-
-    endpoints(node);
-    if( my_rank == 0)
-    {
-        FILE *fp;
-        unsigned long long int amount;
-
-        fp = fopen(argv[2], "r");
-        node.buffer = malloc ( node.size * sizeof(int));
-        if(node.buffer)
-        {
-            amount = fread(node.buffer, sizeof(int), node.size, fp);
-            if(amount == 0)
-            {
-                printf("\nCouldn't read the file.");
-                exit(0);
-            }
-        }
-        else
-        {
-            printf("\nMalloc didn't succed.");
-        }
-    }
-    e(MPI_Scatter(node.buffer, node.local_size, MPI_INT, node.local_buffer, node.local_size, MPI_INT, 0, comm));
-
-    count_occurences(node);
-    e(MPI_Reduce(node.local_occurences, node.occurences, node.intervals, MPI_LONG_INT, MPI_SUM, 0, comm));
-    if(my_rank == 0)
-    {
-        display_histogram(node);
-    }
-
-    destroy(node);
     MPI_Finalize();
+
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    cout<< "\nTime spent = " << time_spent;
+
     return 0;
 }

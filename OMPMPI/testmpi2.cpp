@@ -207,7 +207,8 @@ int check_user_number(char *argv) {
 
 // Input: take an array ptr and size of array
 // Output:  Zeros out the array
-void init_array(int *a, int arr_size) {
+void init_array(int *a, int arr_size)
+{
     new int[arr_size];
     for (int i = 0; i < arr_size; i++)
         a[i] = 0;
@@ -601,15 +602,3 @@ int main(int argc, char *argv[]) {
     shutdown_threads(&tdata);
     return 0;
 }
-© 2017 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-API
-Training
-Shop
-Blog
-About

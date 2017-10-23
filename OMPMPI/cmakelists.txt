@@ -1,0 +1,4 @@
+project("OMP MPI")
+
+
+add(toDo testmpi.cpp)
