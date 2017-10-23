@@ -34,7 +34,7 @@ typedef struct
 
 } node;
 
-void build_mpi_data_type(int* data_1, int* data_2, int* data_3, long int* data_4, long int* data_5, int root)
+void build_mpi_data_type(int* data_1, int* data_2, int* data_3, long int* data_4, long int* data_5)
 {
     MPI_Bcast(data_1, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data_2, 1, MPI_INT, 0, MPI_COMM_WORLD);
