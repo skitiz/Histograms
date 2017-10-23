@@ -113,6 +113,7 @@ void count_occurences(void *ptr, int numThreads)
     node *data = (node *) ptr;
     assert(data->buffer != NULL);
     assert(data->endpoints != NULL);
+    //Edits
 
     //data->occurences = malloc (data->intervals, sizeof(int));
     if(data->occurences == NULL)
