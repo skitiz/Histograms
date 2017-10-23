@@ -57,26 +57,12 @@ void display_histogram (void *ptr)
     assert(data->occurences != NULL);
     assert(data->endpoints != NULL);
 
-    int width = 40;
-    int max = 0;
-    int row_width;
-    int i;
-    int j;
 
-    for(i = 0; i < data->intervals; i++)
-    {
-        if(data->occurences[i] > max)
-            max = data->occurences[i];
-    }
+    float length = endpoints[1] - endpoints[0];
 
     for(i = 0; i < data->intervals; i++ )
     {
-        cout<<" |" << data->endpoints[i];
-        row_width = data->occurences[i] /  max * width;
-        for(j=0; j< row_width; j++)
-        {
-            cout<< "#";
-        }
+        cout<< data->endpoints[i] << " - " << data->endpoints[i] + length;
         cout << "   \n" << data->occurences[i];
     }
 }
