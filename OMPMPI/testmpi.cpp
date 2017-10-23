@@ -122,7 +122,7 @@ void count_occurences(void *ptr, int numThreads)
         MPI_Finalize();
         exit(0);
     }
-    #pragma omp parallel for num_threads(numThreads) default(none) private(i) shared(data)
+    #pragma omp parallel
     for(i = 0; i < data->local_size; i++)
     //#pragma omp parallel for
     {
