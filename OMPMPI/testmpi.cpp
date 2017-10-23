@@ -92,7 +92,7 @@ void count_occurences(void *ptr)
     for(unsigned long long int i = 0; i < data->local_size; i++)
     {
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
-        node->local_occurences[index]++;
+        data->local_occurences[index]++;
     }
 }
 
@@ -150,13 +150,13 @@ void read_file(void *ptr)
                     data->max = data->buffer[i];
                 }
             }
-            fp->fileLength = fp.tellg();
-            fp->iterations = (int) ceil((double) data->fileLength / data->bufferSize);
+            //fp->fileLength = fp.tellg();
+            //fp->iterations = (int) ceil((double) data->fileLength / data->bufferSize);
 
-            if (data->fileLength < data->bufferSize)
-            {
-                data->minMessage = (data->fileLength / data->unit) / data->comm_sz;
-            }
+            //if (data->fileLength < data->bufferSize)
+            //{
+            //    data->minMessage = (data->fileLength / data->unit) / data->comm_sz;
+            //}
         }
         else
         {
