@@ -128,6 +128,10 @@ void count_occurences(void *ptr, int numThreads)
     //#pragma omp parallel for
     for(long int i = 0; i < data->local_size; i++)
     {
+        if((i>5) && (i<10))
+        {
+            cout<<" " <<local_buffer[i];
+        }
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
         data->local_occurences[index]++;
     }
