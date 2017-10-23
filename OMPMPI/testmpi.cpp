@@ -172,7 +172,7 @@ void read_file(void *ptr, int numThreads)
             exit(0);
 		}
 
-        #pragma omp for schedule (static, data->local_size / numThreads)
+        #pragma omp for schedule (static, *data->local_size / numThreads)
         for(unsigned long long int i = 0; i < data->size; i++)
         {
             if(data->buffer[i] < data->min)
