@@ -6,10 +6,10 @@
 #include <assert.h>
 #include <mpi.h>
 #ifdef _OPENMP
-#include <omp.h>
+    #include <omp.h>
+#endif
 #include <sys/stat.h>
 
-endif
 
 using namespace std;
 
