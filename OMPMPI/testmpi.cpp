@@ -24,8 +24,8 @@ typedef struct
     char* filename;
     int min;
     int max;
-    unsigned long long int size;
-    unsigned long long int local_size;
+    long int size;
+    long int local_size;
     int* buffer;
     int* local_buffer;
     float* endpoints;
@@ -33,6 +33,15 @@ typedef struct
     int* local_occurences;
 
 } node;
+
+void build_mpi_data_type(int* data_1, int* data_2, int* data_3, long int* data_4, long int* data_5, int root)
+{
+    MPI_Bcast(data_1, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data_2, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data_3, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data_4, 1, MPI_LONG_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(data_5, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
+}
 
 int user_arguments(char *argv) {
     char *endptr;
@@ -171,11 +180,13 @@ void read_file(void *ptr)
             cout << "\nCannot open file.";
         }
     }
+/*
     MPI_Bcast(data->intervals, 1, MPI_LONG_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data->min, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data->max, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data->size, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data->local_size, 1, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
+*/
 }
 
 void determine_intervals(void *ptr)
@@ -232,6 +243,7 @@ int main(int argc, char* argv[])
     omp_set_dynamic(0);
     read_file(&data);
 
+    build_mpi_data_type(&node.intervals, &node.min, &node.max, &node.size, &node.local_size);
     MPI_Scatter(data.buffer, data.local_size, MPI_INT, data.local_buffer, data.local_size, MPI_INT, 0, MPI_COMM_WORLD);
 
     determine_intervals(&data);
