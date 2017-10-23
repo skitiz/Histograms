@@ -243,7 +243,7 @@ int main(int argc, char* argv[])
     omp_set_dynamic(0);
     read_file(&data);
 
-    build_mpi_data_type(&node.intervals, &node.min, &node.max, &node.size, &node.local_size);
+    build_mpi_data_type(&data.intervals, &data.min, &data.max, &data.size, &data.local_size);
     MPI_Scatter(data.buffer, data.local_size, MPI_INT, data.local_buffer, data.local_size, MPI_INT, 0, MPI_COMM_WORLD);
 
     determine_intervals(&data);
