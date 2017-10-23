@@ -224,30 +224,30 @@ int main(int argc, char* argv[])
 
     data.local_buffer = (int *) malloc(sizeof(int) * data.local_size);
     data.endpoints = (float *) malloc( data.intervals * sizeof(float));
-    data.buffer = (int *) malloc(data.size = * sizeof(int));
-    data.local_buffer = (int *) malloc(local_size * sizeof(int));
+    data.buffer = (int *) malloc(data.size * sizeof(int));
+    data.local_buffer = (int *) malloc(data.local_size * sizeof(int));
     data.local_occurences = (int *) malloc( data.intervals * sizeof(int));
     data.occurences = (int *) malloc (data.intervals * sizeof(int));
 
     omp_set_dynamic(0);
     read_file(&data);
 
-    MPI_Scatter(data.buffer, data.local_size, MPI_INT, data.local_buffer, data.local_size, MPI_INT, 0, MPI_COMM_WORLD));
+    MPI_Scatter(data.buffer, data.local_size, MPI_INT, data.local_buffer, data.local_size, MPI_INT, 0, MPI_COMM_WORLD);
 
     determine_intervals(&data);
 
     count_occurences(&data);
-    MPI_Reduce(data.local_occurences, data.occurences, data.intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD));
+    MPI_Reduce(data.local_occurences, data.occurences, data.intervals, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     if(node.my_rank == 0)
     {
         display_histogram(&data);
     }
 
-    free(data->buffer);
-    free(data->local_buffer);
-    free(data->endpoints);
-    free(data->occurences);
+    free(data.buffer);
+    free(data.local_buffer);
+    free(data.endpoints);
+    free(data.occurences);
 
     MPI_Finalize();
 
