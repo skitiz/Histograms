@@ -9,7 +9,7 @@
         To run : mpiexec -n <n> ./mpi <intervals> <filename> <threads>
 
 
-        Build status : Working
+        Build status : Not Working. Calculating wrong values for histogram.
 
 */
 
