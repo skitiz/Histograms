@@ -92,7 +92,7 @@ void count_occurences(void *ptr)
     for(unsigned long long int i = 0; i < data->local_size; i++)
     {
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
-        node.local_occurences[index]++;
+        node->local_occurences[index]++;
     }
 }
 
@@ -104,6 +104,7 @@ void read_file(void *ptr)
     {
         ifstream fp;
         struct stat file_stat;
+        vector <int> v;
         unsigned long long int amount;
 
         fp.open(data->filename, ios::binary);
@@ -122,7 +123,8 @@ void read_file(void *ptr)
             //data->buffer = malloc( data->size * sizeof(int));
             if(data->buffer)
             {
-                amount = fread(data->buffer, sizeof(int), data->size, fp);
+                fp.read(&v[0], data->size);
+                amount = fp.gcount();
                 if(amount == 0)
                 {
                     cout << "\nCouldn't read the file.";
