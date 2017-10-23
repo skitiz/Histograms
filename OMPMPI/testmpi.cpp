@@ -64,7 +64,7 @@ void display_histogram (void *ptr)
     for(i = 0; i < data->intervals; i++ )
     {
         cout<< data->endpoints[i] << " - " << data->endpoints[i] + length;
-        cout << "   \n" << data->occurences[i];
+        cout << "    " << data->occurences[i] << "\n";
     }
 }
 
@@ -188,7 +188,7 @@ void determine_intervals(void *ptr)
     size_t i = 0;
     for(i =0; i < data->intervals; i++)
     {
-        data->endpoints[i] = data->interval * (i + 1);
+        data->endpoints[i] = data->intervals * (i + 1);
         data->local_occurences[i] = 0;
     }
 }
