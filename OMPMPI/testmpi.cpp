@@ -144,57 +144,49 @@ void read_file(void *ptr)
     node *data = (node *) ptr;
     if(data->my_rank == 0)
     {
-        ifstream fp;
-        //struct stat file_stat;
-        unsigned long long int amount;
+        FILE* fp;
+        struct stat file_stat;
+		unsigned long long int amount;
 
-        fp.open(data->filename, ios::binary);
-        if(fp.is_open())
+		fp = fopen(data->filename, "r");
+		if(fp == NULL)
+		{
+			printf("\nFile doesn't exist.");
+			exit(0);
+		}
+		int result = stat(data->filename, &file_stat);
+		if(result == -1)
+		{
+			printf("\nFile invalid.");
+			exit(0);
+		}
+		data->size = file_stat.st_size;
+		data->size /= sizeof(int);
+		if(data->buffer)
+		{
+			amount = fread(data->buffer, sizeof(int), data->size, fp);
+			if(amount == 0)
+			{
+				printf("\nCouldn't read.");
+				exit(0);
+			}
+		}
+		else
+		{
+			printf("\nValue of malloc didn't succed.");
+		}
+
+        for(unsigned long long int i = 0; i < data->size; i++)
         {
-            //int result = stat(data->filename, &file_stat);
-        /*    if(result == -1)
+            if(data->buffer[i] < data->min)
             {
-                cout << "\nFile Invalid.";
-                MPI_Finalize();
-                exit(0);
+                data->min = data->buffer[i];
             }
-        */
-            fp.seekg(0, fp.end);
-            data->size = fp.tellg();
-            fp.seekg (0, fp.beg);
-            data->size /= sizeof(int);
-            data->local_size = data->size/ data->comm_sz;
-            char* buffer = new char [data->size];
-            //data->buffer = malloc( data->size * sizeof(int));
-            if(data->buffer)
+            if(data->buffer[i] > data->max)
             {
-                fp.read(buffer, data->size);
-                amount = fp.gcount();
-                if(amount == 0)
-                {
-                    cout << "\nCouldn't read the file.";
-                    MPI_Finalize();
-                    exit(0);
-                }
+                data->max = data->buffer[i];
             }
-            else
-            {
-                cout << "\nValue of malloc didn't succed.";
-                MPI_Finalize();
-                exit(0);
-            }
-
-            for(unsigned long long int i = 0; i < data->size; i++)
-            {
-                if(data->buffer[i] < data->min)
-                {
-                    data->min = data->buffer[i];
-                }
-                if(data->buffer[i] > data->max)
-                {
-                    data->max = data->buffer[i];
-                }
-            }
+        }
             //fp->fileLength = fp.tellg();
             //fp->iterations = (int) ceil((double) data->fileLength / data->bufferSize);
 
@@ -202,12 +194,8 @@ void read_file(void *ptr)
             //{
             //    data->minMessage = (data->fileLength / data->unit) / data->comm_sz;
             //}
-        }
-        else
-        {
-            cout << "\nCannot open file.";
-        }
     }
+}
 /*
     MPI_Bcast(data->intervals, 1, MPI_LONG_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(data->min, 1, MPI_INT, 0, MPI_COMM_WORLD);
