@@ -55,7 +55,7 @@ void display_histogram (void *ptr)
     for(i = 0; i < data->intervals; i++ )
     {
         cout<<" |" << data->endpoints[i];
-        row_width = (float) data->occurences / (float) max * (float) width;
+        row_width = data->occurences[i] /  max * width;
         for(j=0; j< row_width; j++)
         {
             cout<< "#";
@@ -64,16 +64,27 @@ void display_histogram (void *ptr)
     }
 }
 
+void determine_index(int temp, float* endpoints, long int intervals)
+{
+    assert(endpoints != NULL);
+    size_t index;
+    for( index = 0; i< intervals -1 ; index++)
+    {
+        if(temp <= endpoints[index]) break;
+    }
+    return index;
+}
+
 void count_occurences(void *ptr)
 {
     node *data = (node *) ptr;
     assert(data->buffer != NULL);
     assert(data->endpoints != NULL);
 
-    data->occurences = calloc (data->intervals, sizeof(unsigned long long int));
+    data->occurences = malloc (data->intervals, sizeof(unsigned long long int));
     if(data->occurences == NULL)
     {
-        cout>> "\nMemory allocation failed....Exiting." ;
+        cout<<"\nMemory allocation failed....Exiting." ;
         MPI_Finalize();
         exit(0);
     }
@@ -81,19 +92,8 @@ void count_occurences(void *ptr)
     for(unsigned long long int i = 0; i < data->local_size; i++)
     {
         size_t index = determine_index (data->local_buffer[i], data->endpoints, data->intervals);
-        local_occurences[index]++
+        node.local_occurences[index]++;
     }
-}
-
-void determine_index(int temp, float* endpoints, long int intervals)
-{
-    assert(endpoints != NULL)
-    size_t index;
-    for( index = 0; i< intervals -1 ; index++)
-    {
-        if(temp <= endpoints[index]) break;
-    }
-    return index;
 }
 
 
