@@ -30,5 +30,5 @@ void main(int argc, char *argv[]) {
     bin_counts = get_args(argv[2]);
 
     read_file(filename, &min, &max, &size, &local_size, comm_sz, my_rank, bin_counts);
+    
 }
-
